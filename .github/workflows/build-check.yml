@@ -1,4 +1,4 @@
-name: Docker Build with Vulnerability Scan
+name: Docker Build + Trivy
 
 on:
   workflow_call:
