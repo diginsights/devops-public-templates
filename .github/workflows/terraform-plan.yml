@@ -23,7 +23,7 @@ on:
         required: true
 
 jobs:
-  build:
+  terraform-plan:
     permissions:
       id-token: write
       contents: read
