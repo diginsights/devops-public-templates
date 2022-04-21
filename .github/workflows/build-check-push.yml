@@ -2,7 +2,7 @@ name: Docker Build + Trivy + ECR Push
 
 on:
   workflow_call:
-    secrets:
+    inputs:
       gh_deploy_env:
         required: true
         type: string
