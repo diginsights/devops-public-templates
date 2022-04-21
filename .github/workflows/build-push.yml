@@ -50,14 +50,14 @@ jobs:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        role-to-assume: ${{ inputs.pipeline_role_arn }}
-        aws-region: ${{ inputs.aws_region }}
+        role-to-assume: ${{ secrets.pipeline_role_arn }}
+        aws-region: ${{ secrets.aws_region }}
     - name: Build the Docker image
       env:
-        ECR_BASE_IMAGE_REGISTRY: ${{ inputs.ecr_base_image_registry }}
-        ECR_FINAL_IMAGE_REGISTRY: ${{ inputs.ecr_final_image_registry }}
-        AWS_REGION: ${{ inputs.aws_region }}
-        IMAGE_NAME: ${{ inputs.image_name }}
+        ECR_BASE_IMAGE_REGISTRY: ${{ secrets.ecr_base_image_registry }}
+        ECR_FINAL_IMAGE_REGISTRY: ${{ secrets.ecr_final_image_registry }}
+        AWS_REGION: ${{ secrets.aws_region }}
+        IMAGE_NAME: ${{ secrets.image_name }}
       run: |
         aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_BASE_IMAGE_REGISTRY
         BRANCH_NAME=$(echo $GITHUB_REF_NAME | cut -d / -f 2)
@@ -67,9 +67,9 @@ jobs:
         echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
     - name: Push Image to ECR
       env:
-        ECR_FINAL_IMAGE_REGISTRY: ${{ inputs.ecr_final_image_registry }}
-        AWS_REGION: ${{ inputs.aws_region }}
-        IMAGE_NAME: ${{ inputs.image_name }}
+        ECR_FINAL_IMAGE_REGISTRY: ${{ secrets.ecr_final_image_registry }}
+        AWS_REGION: ${{ secrets.aws_region }}
+        IMAGE_NAME: ${{ secrets.image_name }}
         IMAGE_TAG: ${{ env.IMAGE_TAG }}
       run: |
         aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_FINAL_IMAGE_REGISTRY

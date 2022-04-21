@@ -46,10 +46,10 @@ jobs:
         cli_config_credentials_token: ${{ secrets.tfc_token }}
     - name: Terraform Apply
       env:
-        EKS_CLUSTER_NAME: ${{ inputs.eks_cluster_name }}
+        EKS_CLUSTER_NAME: ${{ secrets.eks_cluster_name }}
         AWS_DEPLOY_ENV: ${{ inputs.aws_deploy_env }}
-        AWS_ACCOUNT_ID: ${{ inputs.aws_account_id }}
-        APP_NAME: ${{ inputs.app_name }}
+        AWS_ACCOUNT_ID: ${{ secrets.aws_account_id }}
+        APP_NAME: ${{ secrets.app_name }}
       run: |
         export REPOSITORY_NAME=$(echo $GITHUB_REPOSITORY | cut -d / -f 2)
         printenv > ./.devops/scripts/vars.env
