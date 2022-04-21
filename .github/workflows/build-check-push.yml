@@ -24,7 +24,7 @@ on:
         required: true
 
     outputs:
-      image_tag:
+      imagetag:
         value: ${{ jobs.build.outputs.imagetag }}
 
 jobs:

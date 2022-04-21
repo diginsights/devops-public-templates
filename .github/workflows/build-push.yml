@@ -19,7 +19,7 @@ on:
       ecr_final_image_registry:
         required: true
     outputs:
-      image_tag:
+      imagetag:
         value: ${{ jobs.build.outputs.imagetag }}
 
 jobs:
