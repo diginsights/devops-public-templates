@@ -3,21 +3,6 @@ name: Docker Build + Trivy + ECR Push
 on:
   workflow_call:
     inputs:
-      image_name:
-        required: true
-        type: string
-      aws_region:
-        required: true
-        type: string
-      pipeline_role_arn:
-        required: true
-        type: string
-      ecr_base_image_registry:
-        required: true
-        type: string
-      ecr_final_image_registry:
-        required: true
-        type: string
       gh_deploy_env:
         required: true
         type: string
@@ -25,6 +10,19 @@ on:
         default: 'CRITICAL,HIGH'
         required: false
         type: string
+        
+    secrets:
+      image_name:
+        required: true
+      aws_region:
+        required: true
+      pipeline_role_arn:
+        required: true
+      ecr_base_image_registry:
+        required: true
+      ecr_final_image_registry:
+        required: true
+
     outputs:
       image_tag:
         value: ${{ jobs.build.outputs.imagetag }}
