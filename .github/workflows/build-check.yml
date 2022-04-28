@@ -24,7 +24,6 @@ on:
         required: true
       build_args:
         required: false
-        default: ""
 
 jobs:
   build:
