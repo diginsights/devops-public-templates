@@ -22,6 +22,9 @@ on:
         required: true
       ecr_final_image_registry:
         required: true
+      build_args:
+        required: false
+        default: ""
 
     outputs:
       imagetag:
