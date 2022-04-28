@@ -22,8 +22,6 @@ on:
         required: true
       ecr_final_image_registry:
         required: true
-      build_args:
-        required: false
 
     outputs:
       imagetag:
@@ -65,13 +63,12 @@ jobs:
         ECR_FINAL_IMAGE_REGISTRY: ${{ secrets.ecr_final_image_registry }}
         AWS_REGION: ${{ secrets.aws_region }}
         IMAGE_NAME: ${{ secrets.image_name }}
-        BUILD_ARGS: ${{ secrets.build_args }}
       run: |
         aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_BASE_IMAGE_REGISTRY
         BRANCH_NAME=$(echo $GITHUB_REF_NAME | cut -d / -f 2)
         export IMAGE_TAG="$GITHUB_RUN_ID$(date '+%H%M%S')-$BRANCH_NAME"
-        docker build $(if [ -z $BUILD_ARGS ] ; then echo "" ; else echo $BUILD_ARGS ; fi) . --file Dockerfile --tag $IMAGE_NAME
-        docker build $(if [ -z $BUILD_ARGS ] ; then echo "" ; else echo $BUILD_ARGS ; fi) . --file Dockerfile --tag $ECR_FINAL_IMAGE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+        docker build . --file Dockerfile --tag $IMAGE_NAME
+        docker build . --file Dockerfile --tag $ECR_FINAL_IMAGE_REGISTRY/$IMAGE_NAME:$IMAGE_TAG
         echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
