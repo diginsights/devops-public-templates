@@ -1,0 +1,84 @@
+name: Docker Build + Trivy + ECR Push
+
+on:
+  workflow_call:
+    inputs:
+      gh_deploy_env:
+        required: true
+        type: string
+      trivy_severity:
+        default: 'CRITICAL,HIGH'
+        required: false
+        type: string
+      trivy_skip_dirs:
+        default: ''
+        required: false
+        type: string
+
+    secrets:
+      image_name:
+        required: true
+      aws_region:
+        required: true
+      pipeline_role_arn:
+        required: true
+      ecr_image_registry:
+        required: true
+
+    outputs:
+      imagetag:
+        value: ${{ jobs.build.outputs.imagetag }}
+
+jobs:
+  build:
+    permissions:
+      id-token: write
+      contents: read
+      actions: read
+      checks: read
+      deployments: read
+      issues: none
+      discussions: none
+      packages: none
+      pages: none
+      pull-requests: none
+      repository-projects: none
+      security-events: none
+      statuses: write
+
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.gh_deploy_env }}
+
+    outputs:
+      imagetag: ${{ steps.output.outputs.imagetag }}
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        role-to-assume: ${{ secrets.pipeline_role_arn }}
+        aws-region: ${{ secrets.aws_region }}
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+    - name: Build and push
+      uses: docker/build-push-action@v3
+      with:
+        context: .
+        push: true
+        tags: "${{ secrets.ECR_IMAGE_REGISTRY }}/${{ secrets.IMAGE_NAME }}:${{ github.sha }}"
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ secrets.IMAGE_NAME }}
+        exit-code: '1'
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+        severity: ${{ inputs.trivy_severity }}
+        skip-dirs: ${{ inputs.trivy_skip_dirs }}
+    - id: output
+      name: Export IMAGETAG
+      env:
+        IMAGE_TAG: ${{ env.IMAGE_TAG }}
+      run: echo "::set-output name=imagetag::$IMAGE_TAG"
