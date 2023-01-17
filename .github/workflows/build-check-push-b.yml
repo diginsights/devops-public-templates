@@ -80,5 +80,5 @@ jobs:
     - id: output
       name: Export IMAGETAG
       env:
-        IMAGE_TAG: ${{ env.IMAGE_TAG }}
+        IMAGE_TAG: ${{ github.sha }}
       run: echo "::set-output name=imagetag::$IMAGE_TAG"
